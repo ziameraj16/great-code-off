@@ -11,4 +11,11 @@ import java.util.List;
 @Path("/greatcodeoff")
 public class AppResource {
 
+    @Inject private AppService appService;
+
+    @GET
+    @Path("/max-spent")
+    public List<Result> getMaxSpentCustomerDetails() {
+        return appService.getMaxSpentCustomer();
+    }
 }
