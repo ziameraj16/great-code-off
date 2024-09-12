@@ -7,11 +7,13 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.Test;
 import org.version1.client.CustomerClient;
 import org.version1.client.InvoiceClient;
+import org.version1.exception.ApplicationException;
 import org.version1.model.Result;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @QuarkusTest
@@ -21,7 +23,8 @@ class AppServiceTest {
     @InjectMock @RestClient private InvoiceClient invoiceClient;
     @Inject private AppService appService;
 
-    @Test void getMaxSpentCustomer() {
+    @Test
+    void getMaxSpentCustomer() {
         when(invoiceClient.getInvoices()).thenReturn(INVOICE_RESULT);
         when(customerClient.getCustomers()).thenReturn(CUSTOMER_RESULT);
         final List<Result> actual = appService.getMaxSpentCustomer();
@@ -32,6 +35,16 @@ class AppServiceTest {
         assertEquals("David", actual.get(1).name);
         assertEquals("Nap", actual.get(1).surname);
         assertEquals(235.78, actual.get(1).amount);
+    }
+
+    @Test
+    void getMaxSpentCustomer_throwsException() {
+        when(customerClient.getCustomers()).thenReturn("Invalid JSON");
+        ApplicationException exception = assertThrows(
+                ApplicationException.class, () -> appService.getMaxSpentCustomer(),
+                "Expected to throw ApplicationException, but it didn't"
+        );
+        assertEquals("Not able to parse response from external APIs", exception.getMessage());
     }
 
     private static final String INVOICE_RESULT = """
