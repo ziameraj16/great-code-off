@@ -12,9 +12,9 @@ import org.version1.model.Customers;
 import org.version1.model.Invoices;
 import org.version1.model.Result;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class AppService {
@@ -35,12 +35,14 @@ public class AppService {
         }
         final double maxAmount = getMaxAmountFromInvoices(invoices);
         final List<Integer> customerIds = getCustomerIdsWithMaxAmount(invoices, maxAmount);
-        final List<Customer> maxAmtCustomers = customers.customers.stream().filter(c -> customerIds.contains(c.ID)).toList();
-        List<Result> results = new ArrayList<>();
-        for (Customer customer : maxAmtCustomers) {
-            results.add(new Result(customer.name, customer.surname, maxAmount));
-        }
+        final List<Customer> maxAmtCustomers = getCustomerDetailsFromIds(customers, customerIds);
+        List<Result> results = maxAmtCustomers.stream().map(customer -> new Result(customer.name, customer.surname, maxAmount)).collect(Collectors.toList());
         return results;
+    }
+
+    private static List<Customer> getCustomerDetailsFromIds(Customers customers, List<Integer> customerIds) {
+        final List<Customer> maxAmtCustomers = customers.customers.stream().filter(c -> customerIds.contains(c.ID)).toList();
+        return maxAmtCustomers;
     }
 
     private static List<Integer> getCustomerIdsWithMaxAmount(Invoices invoices, double maxAmount) {
