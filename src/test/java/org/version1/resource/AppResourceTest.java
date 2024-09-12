@@ -4,13 +4,13 @@ import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.version1.model.Result;
 import org.version1.service.AppService;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @QuarkusTest
 class AppResourceTest {
@@ -21,7 +21,7 @@ class AppResourceTest {
     @Test
     void getMaxSpentCustomerDetails() {
         List<Result> expected = List.of(new Result("Tom", "Cruise", 33.73), new Result("Hannah", "Rob", 33.73));
-        Mockito.when(appService.getMaxSpentCustomer()).thenReturn(expected);
+        when(appService.getMaxSpentCustomer()).thenReturn(expected);
         List<Result> actual = appResource.getMaxSpentCustomerDetails();
         assertEquals(2, actual.size());
         assertEquals("Tom", actual.get(0).name);
