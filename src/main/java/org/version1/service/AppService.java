@@ -35,11 +35,14 @@ public class AppService {
         if (customers.customers == null || customers.customers.isEmpty()) {
             throw new ThirdPartyException("No data found for customers");
         }
+        if (invoices.invoices == null || invoices.invoices.isEmpty()) {
+            throw new ThirdPartyException("No data found for invoices");
+        }
+
         final double maxAmount = getMaxAmountFromInvoices(invoices);
         final List<Integer> customerIds = getCustomerIdsWithMaxAmount(invoices, maxAmount);
         final List<Customer> maxAmtCustomers = getCustomerDetailsFromIds(customers, customerIds);
-        List<Result> results = maxAmtCustomers.stream().map(customer -> new Result(customer.name, customer.surname, maxAmount)).toList();
-        return results;
+        return maxAmtCustomers.stream().map(customer -> new Result(customer.name, customer.surname, maxAmount)).toList();
     }
 
     private static List<Customer> getCustomerDetailsFromIds(Customers customers, List<Integer> customerIds) {

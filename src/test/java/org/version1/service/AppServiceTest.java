@@ -54,6 +54,22 @@ class AppServiceTest {
     }
 
     @Test
+    void testEmptyInvoicesResponse() {
+        when(invoiceClient.getInvoices()).thenReturn("""
+                {
+                  "invoices": [
+                  ]
+                }
+                """);
+        when(customerClient.getCustomers()).thenReturn(CUSTOMER_RESULT);
+        ThirdPartyException exception = assertThrows(
+                ThirdPartyException.class, () -> appService.getMaxSpentCustomer(),
+                "Expected to throw ApplicationException, but it didn't"
+        );
+        assertEquals("No data found for invoices", exception.getMessage());
+    }
+
+    @Test
     void getMaxSpentCustomer_throwsException() {
         when(customerClient.getCustomers()).thenReturn("Invalid JSON");
         ThirdPartyException exception = assertThrows(
