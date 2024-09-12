@@ -9,6 +9,7 @@ import org.version1.client.InvoiceClient;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.Mockito.when;
 
 @QuarkusTest
@@ -18,7 +19,7 @@ class AppResourceIT {
     @InjectMock @RestClient private InvoiceClient invoiceClient;
 
     @Test
-    public void testHelloEndpoint() {
+    public void testEndpoint() {
         when(invoiceClient.getInvoices()).thenReturn(INVOICE_RESULT);
         when(customerClient.getCustomers()).thenReturn(CUSTOMER_RESULT);
         given()
@@ -26,6 +27,16 @@ class AppResourceIT {
                 .then()
                 .statusCode(200)
                 .body(is("[{\"name\":\"Alice\",\"surname\":\"Klark\",\"amount\":235.78},{\"name\":\"David\",\"surname\":\"Nap\",\"amount\":235.78}]"));
+    }
+
+    @Test
+    public void throwsError() {
+        when(customerClient.getCustomers()).thenReturn("Invalid JSON");
+        given()
+                .when().get("/greatcodeoff/max-spent")
+                .then()
+                .statusCode(500)
+                .body(containsString("Not able to parse response from external APIs"));
     }
 
     private static final String INVOICE_RESULT = """

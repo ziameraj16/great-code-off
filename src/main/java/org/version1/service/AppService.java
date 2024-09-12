@@ -14,7 +14,6 @@ import org.version1.model.Result;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class AppService {
@@ -36,7 +35,7 @@ public class AppService {
         final double maxAmount = getMaxAmountFromInvoices(invoices);
         final List<Integer> customerIds = getCustomerIdsWithMaxAmount(invoices, maxAmount);
         final List<Customer> maxAmtCustomers = getCustomerDetailsFromIds(customers, customerIds);
-        List<Result> results = maxAmtCustomers.stream().map(customer -> new Result(customer.name, customer.surname, maxAmount)).collect(Collectors.toList());
+        List<Result> results = maxAmtCustomers.stream().map(customer -> new Result(customer.name, customer.surname, maxAmount)).toList();
         return results;
     }
 
