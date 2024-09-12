@@ -33,13 +33,22 @@ public class AppService {
         } catch (JsonProcessingException e) {
             throw new ApplicationException("Not able to parse response from external APIs", e);
         }
-        final double maxAmount = invoices.invoices.stream().max(Comparator.comparing(v -> v.amount)).get().amount;
-        final List<Integer> customerIds = invoices.invoices.stream().filter(invoice -> invoice.amount == maxAmount).map(invoice -> invoice.customerId).toList();
+        final double maxAmount = getMaxAmountFromInvoices(invoices);
+        final List<Integer> customerIds = getCustomerIdsWithMaxAmount(invoices, maxAmount);
         final List<Customer> maxAmtCustomers = customers.customers.stream().filter(c -> customerIds.contains(c.ID)).toList();
         List<Result> results = new ArrayList<>();
         for (Customer customer : maxAmtCustomers) {
             results.add(new Result(customer.name, customer.surname, maxAmount));
         }
         return results;
+    }
+
+    private static List<Integer> getCustomerIdsWithMaxAmount(Invoices invoices, double maxAmount) {
+        final List<Integer> customerIds = invoices.invoices.stream().filter(invoice -> invoice.amount == maxAmount).map(invoice -> invoice.customerId).toList();
+        return customerIds;
+    }
+
+    private static double getMaxAmountFromInvoices(Invoices invoices) {
+        return invoices.invoices.stream().max(Comparator.comparing(v -> v.amount)).get().amount;
     }
 }
