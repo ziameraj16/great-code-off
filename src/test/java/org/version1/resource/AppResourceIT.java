@@ -39,6 +39,17 @@ class AppResourceIT {
                 .body(containsString("Not able to parse response from external APIs"));
     }
 
+    @Test
+    public void testExternalEndpoint() {
+        when(invoiceClient.getInvoices()).thenReturn(INVOICE_RESULT);
+        when(customerClient.getCustomers()).thenReturn("{}");
+        given()
+                .when().get("/greatcodeoff/max-spent")
+                .then()
+                .statusCode(500)
+                .body(containsString("No data found for customers"));
+    }
+
     private static final String INVOICE_RESULT = """
             {
               "invoices": [
