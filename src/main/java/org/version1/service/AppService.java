@@ -6,7 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.version1.client.CustomerClient;
 import org.version1.client.InvoiceClient;
-import org.version1.exception.ApplicationException;
+import org.version1.exception.ThirdPartyException;
 import org.version1.model.Customer;
 import org.version1.model.Customers;
 import org.version1.model.Invoices;
@@ -30,7 +30,10 @@ public class AppService {
             customers = objectMapper.readValue(customerClient.getCustomers(), Customers.class);
             invoices = objectMapper.readValue(invoiceClient.getInvoices(), Invoices.class);
         } catch (JsonProcessingException e) {
-            throw new ApplicationException("Not able to parse response from external APIs", e);
+            throw new ThirdPartyException("Not able to parse response from external APIs", e);
+        }
+        if (customers.customers == null || customers.customers.isEmpty()) {
+            throw new ThirdPartyException("No data found for customers");
         }
         final double maxAmount = getMaxAmountFromInvoices(invoices);
         final List<Integer> customerIds = getCustomerIdsWithMaxAmount(invoices, maxAmount);

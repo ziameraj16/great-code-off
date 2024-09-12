@@ -7,7 +7,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.Test;
 import org.version1.client.CustomerClient;
 import org.version1.client.InvoiceClient;
-import org.version1.exception.ApplicationException;
+import org.version1.exception.ThirdPartyException;
 import org.version1.model.Result;
 
 import java.util.List;
@@ -38,10 +38,26 @@ class AppServiceTest {
     }
 
     @Test
+    void testEmptyCustomerResponse() {
+        when(invoiceClient.getInvoices()).thenReturn(INVOICE_RESULT);
+        when(customerClient.getCustomers()).thenReturn("""
+                {
+                  "customers": [
+                  ]
+                }
+                """);
+        ThirdPartyException exception = assertThrows(
+                ThirdPartyException.class, () -> appService.getMaxSpentCustomer(),
+                "Expected to throw ApplicationException, but it didn't"
+        );
+        assertEquals("No data found for customers", exception.getMessage());
+    }
+
+    @Test
     void getMaxSpentCustomer_throwsException() {
         when(customerClient.getCustomers()).thenReturn("Invalid JSON");
-        ApplicationException exception = assertThrows(
-                ApplicationException.class, () -> appService.getMaxSpentCustomer(),
+        ThirdPartyException exception = assertThrows(
+                ThirdPartyException.class, () -> appService.getMaxSpentCustomer(),
                 "Expected to throw ApplicationException, but it didn't"
         );
         assertEquals("Not able to parse response from external APIs", exception.getMessage());
