@@ -42,6 +42,9 @@ public class AppService {
         final double maxAmount = getMaxAmountFromInvoices(invoices);
         final List<Integer> customerIds = getCustomerIdsWithMaxAmount(invoices, maxAmount);
         final List<Customer> maxAmtCustomers = getCustomerDetailsFromIds(customers, customerIds);
+        if (maxAmtCustomers.isEmpty()) {
+            throw new ThirdPartyException(String.format("No customer found for IDS: %s", customerIds));
+        }
         return maxAmtCustomers.stream().map(customer -> new Result(customer.name, customer.surname, maxAmount)).toList();
     }
 

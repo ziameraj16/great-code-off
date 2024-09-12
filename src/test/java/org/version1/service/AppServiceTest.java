@@ -38,6 +38,27 @@ class AppServiceTest {
     }
 
     @Test
+    void testCustomerMismatch() {
+        when(invoiceClient.getInvoices()).thenReturn(INVOICE_RESULT);
+        when(customerClient.getCustomers()).thenReturn("""
+                {
+                  "customers": [
+                    {
+                      "ID": 100,
+                      "name": "Alice",
+                      "surname": "Klark"
+                    }
+                  ]
+                }
+                """);
+        ThirdPartyException exception = assertThrows(
+                ThirdPartyException.class, () -> appService.getMaxSpentCustomer(),
+                "Expected to throw ThirdPartyException, but it didn't"
+        );
+        assertEquals("No customer found for IDS: [0, 3]", exception.getMessage());
+    }
+
+    @Test
     void testEmptyCustomerResponse() {
         when(invoiceClient.getInvoices()).thenReturn(INVOICE_RESULT);
         when(customerClient.getCustomers()).thenReturn("""
@@ -48,7 +69,7 @@ class AppServiceTest {
                 """);
         ThirdPartyException exception = assertThrows(
                 ThirdPartyException.class, () -> appService.getMaxSpentCustomer(),
-                "Expected to throw ApplicationException, but it didn't"
+                "Expected to throw ThirdPartyException, but it didn't"
         );
         assertEquals("No data found for customers", exception.getMessage());
     }
@@ -64,7 +85,7 @@ class AppServiceTest {
         when(customerClient.getCustomers()).thenReturn(CUSTOMER_RESULT);
         ThirdPartyException exception = assertThrows(
                 ThirdPartyException.class, () -> appService.getMaxSpentCustomer(),
-                "Expected to throw ApplicationException, but it didn't"
+                "Expected to throw ThirdPartyException, but it didn't"
         );
         assertEquals("No data found for invoices", exception.getMessage());
     }
@@ -74,7 +95,7 @@ class AppServiceTest {
         when(customerClient.getCustomers()).thenReturn("Invalid JSON");
         ThirdPartyException exception = assertThrows(
                 ThirdPartyException.class, () -> appService.getMaxSpentCustomer(),
-                "Expected to throw ApplicationException, but it didn't"
+                "Expected to throw ThirdPartyException, but it didn't"
         );
         assertEquals("Not able to parse response from external APIs", exception.getMessage());
     }
