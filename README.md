@@ -11,3 +11,5 @@ This project uses Quarkus Java Framework.
 ```bash
 ./mvnw quarkus:dev
 ```
+The application will start running on port 8080. 
+Go to the URL (http://localhost:8080/greatcodeoff/max-spent)

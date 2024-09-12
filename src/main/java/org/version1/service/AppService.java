@@ -7,12 +7,14 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.version1.client.CustomerClient;
 import org.version1.client.InvoiceClient;
 import org.version1.exception.ApplicationException;
-import org.version1.model.*;
+import org.version1.model.Customer;
+import org.version1.model.Customers;
+import org.version1.model.Invoices;
+import org.version1.model.Result;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class AppService {
